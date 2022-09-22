@@ -1,0 +1,57 @@
+﻿@page "/image-search"
+@using ImageFinder.Data
+
+@inject IImageFinderService ImageFinder
+
+<h3>Image Search</h3>
+
+<div class="inputForm" >
+    <input placeholder="Ingrese la imagen que desea buscar!!" @bind-value="@textSearch" class="form-control" />
+    <button type="submit" class="btn btn-success" @onclick="@SearchImages">Buscar</button>
+</div>
+
+@if (images is null)
+{
+    <div style="text-align:center">
+        <div class="spinner-border text-success" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container">
+        <div class="center">
+            @foreach (var image in images)
+            {
+                <div class="article">
+                    <img src="@image.Urls.Regular" width="370"/>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+
+<p style="text-align:center">Footer page</p>
+
+
+
+
+@code {
+    private List<Image>? images;
+    private string textSearch { get; set; } = string.Empty;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        images = await ImageFinder.GetListPhotosAsync();
+    }
+
+    private async void SearchImages(){
+        var response = await ImageFinder.SearchPhotosAsync(textSearch);
+        images = response.Results;
+        StateHasChanged();
+    }
+
+}
